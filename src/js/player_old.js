@@ -34,8 +34,9 @@ ctx.fill();
 
 
 const video_thumbnail = new Image(10, 10);
-video_thumbnail.src = 'https://iloot.it/assets/images/cover_img_1.jpg'; // This won't work...
 video_thumbnail.onload = drawThumbnail;
+video_thumbnail.src = '../samples/thumbnail.png'; // This won't work...
+
 
 
 //const icon_thumbnail = new Image(10, 10);
@@ -45,7 +46,7 @@ video_thumbnail.onload = drawThumbnail;
 
 
 function drawThumbnail() {
-		//ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+		ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
 
 
 		//ctx.drawImage(icon_thumbnail, canvas.width / 2, canvas.width / 2, 128, 128);
@@ -72,33 +73,6 @@ var mouse_posY = 0;
 canvas.onmousemove = function(e) {
 	mouse_posX = e.clientX,
 	mouse_posY = e.clientY;
-
-
-
-
-
-
-	
-/*
-	var rect = this.getBoundingClientRect(),
-		x = e.clientX - rect.left,
-		y = e.clientY - rect.top,
-		i = 0, r;
-  
-	//console.log( x + " " + y );
-
-   
-
-	//ctx.beginPath();
-	ctx.fillStyle = "blue";
-	ctx.rect(pause_region.x, pause_region.y, pause_region.w, pause_region.h);    
-	ctx.fill();
-
-	//console.log(ctx.isPointInPath(x, y));
-	ctx.fillStyle = ctx.isPointInPath(x, y) ? "red" : "blue";*/
-	
-  
-
 };
 
 
@@ -141,10 +115,10 @@ function readyToPlayVideo(event){
 
 
 function updateCanvas(){
-
 	ctx.beginPath();
+	
 	ctx.rect(pause_regionX, pause_regionY, pause_regionW, pause_regionH);
-	console.log(ctx.isPointInPath(mouse_posX, mouse_posY));
+	ctx.fillStyle = ctx.isPointInPath(mouse_posX, mouse_posY) ? "green" : "blue";
 	if(ctx.isPointInPath(mouse_posX, mouse_posY)){
 		pause_regionIN = true;
 	} else {
@@ -152,13 +126,9 @@ function updateCanvas(){
 	}
 
 
-
-	ctx.fill();
-
 	
 
 
-	ctx.clearRect(0,0,canvas.width,canvas.height); 
 
 	if(videoContainer !== undefined && videoContainer.ready){ 
 		video.muted = muted;
@@ -167,39 +137,24 @@ function updateCanvas(){
 		var vidW = videoContainer.video.videoWidth;
 		var top = canvas.height / 2 - (vidH /2 ) * scale;
 		var left = canvas.width / 2 - (vidW /2 ) * scale;
-
+		
+		if(!videoContainer.video.paused && videoContainer.video.currentTime > 0){  
+			ctx.clearRect(0,0,canvas.width,canvas.height); 
+			console.log(videoContainer.video.currentTime);
+		}
 		ctx.drawImage(videoContainer.video, left, top, vidW * scale, vidH * scale);
-
-
-		/*
-		if(videoContainer.video.paused){ 
-			drawPayIcon();
-		}*/
+		DrawMenus()
 	}
 	requestAnimationFrame(updateCanvas);
+}
+function DrawMenus() {
+	ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+	ctx.rect(0, canvas.height -22, canvas.width, 22);
+	ctx.fill();
 }
 
 
 
-
-
-
-/*
-function drawPayIcon(){
-	ctx.fillStyle = "black";
-	ctx.globalAlpha = 0.5;
-	ctx.fillRect(0,0,canvas.width,canvas.height);
-	ctx.fillStyle = "#DDD";
-	ctx.globalAlpha = 0.75;
-	ctx.beginPath();
-	var size = (canvas.height / 2) * 0.5; 
-	ctx.moveTo(canvas.width/2 + size/2, canvas.height / 2);
-	ctx.lineTo(canvas.width/2 - size/1, canvas.height / 2 + size);
-	ctx.lineTo(canvas.width/2 - size/1, canvas.height / 2 - size);
-	ctx.closePath();
-	ctx.fill();
-	ctx.globalAlpha = 1;
-}  */
 
 function playPauseClick(){
 	if(videoContainer !== undefined && videoContainer.ready){
