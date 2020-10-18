@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>example player</title>
+		
+		<!-- Old shit player js code -->
+		<script>
+			var mediaSource = "../samples/bee_sample.mp4";
+		</script>
+
+	</head>
+	<body>
+		<canvas id="example_window" width="1280px" height="720px"></canvas>
+		<script src="../src/js/player_old.js"></script> <!-- The old trash test player -->
+		<script src="../src/js/player.js"></script> <!-- The new player, In development -->
+		
+		<!-- The old trash player js code, In development -->
+		<script>
+			var player = Player("example_window");
+			player.media = "../samples/earth_sample.mp4";
+		</script>
+	</body>
+</html>

@@ -143,22 +143,19 @@ function readyToPlayVideo(event){
 function updateCanvas(){
 	
 	if(!videoContainer.video.paused && videoContainer.video.currentTime > 0){  
-
+		Player_State = 1;
 		ctx.clearRect(0,0,canvas.width,canvas.height);
 		
 		ctx.fillStyle = "black";
 		ctx.fillRect(0,0,canvas.width,canvas.height);
 		ctx.fill();
 	}
-	
 
 	
 	if(Player_State == 0){
 		ctx.clearRect(0,0,canvas.width,canvas.height);
 		
-		if(!videoContainer.video.paused){ 
-			Player_State = 1;
-		}
+
 
 
 		if(video_thumbnail_ready) {
@@ -217,9 +214,15 @@ function updateCanvas(){
 		var top = canvas.height / 2 - (vidH /2 ) * scale;
 		var left = canvas.width / 2 - (vidW /2 ) * scale;
 		
-
+		ctx.filter = "blur(12px)";
+		ctx.drawImage(videoContainer.video, 0, 0, canvas.width, canvas.height);
+		ctx.fill();
+		
+		ctx.filter = "none";
 		ctx.drawImage(videoContainer.video, left, top, vidW * scale, vidH * scale);
 		ctx.fill();
+		
+
 		DrawMenus()
 	}
 	}
