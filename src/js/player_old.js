@@ -125,9 +125,11 @@ function readyToPlayVideo(event){
 	try {
 		requestAnimationFrame(updateCanvas);
 		videoContainer.video.play();
+		
 		if(!videoContainer.video.paused){ 
 			Player_State = 1;
 		}
+		
 	} catch(e){
 		console.log("bruh");
 	}
@@ -153,7 +155,10 @@ function updateCanvas(){
 	
 	if(Player_State == 0){
 		ctx.clearRect(0,0,canvas.width,canvas.height);
-
+		
+		if(!videoContainer.video.paused){ 
+			Player_State = 1;
+		}
 
 
 		if(video_thumbnail_ready) {
