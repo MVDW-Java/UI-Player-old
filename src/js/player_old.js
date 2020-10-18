@@ -125,6 +125,9 @@ function readyToPlayVideo(event){
 	try {
 		requestAnimationFrame(updateCanvas);
 		videoContainer.video.play();
+		if(!videoContainer.video.paused){ 
+			Player_State = 1;
+		}
 	} catch(e){
 		console.log("bruh");
 	}
