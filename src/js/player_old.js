@@ -6,6 +6,9 @@
 
 
 // Data stuff
+var Player_State = 0;
+
+
 var muted = false;
 var canvas = document.getElementById("example_window");
 var ctx = canvas.getContext("2d");
@@ -26,31 +29,50 @@ videoContainer = {
 //	Thumbnail on load
 // ------------------------------
 */
-ctx.fillStyle = "black";
-ctx.fillRect(0,0,canvas.width,canvas.height);
-ctx.fill();
+	//ready?
+	var video_thumbnail_play_ready = false;
+	var video_thumbnail_ready = false;
+	var pause_button_ready = false;
+	var play_button_ready = false;
+	var rewatch_button_ready = false;
+	
+	//Loading up image
+	const video_thumbnail = new Image(0, 0);
+	video_thumbnail.onload = MakeReady(1);
+	video_thumbnail.src = '../samples/thumbnail.png';
+	
+	const video_thumbnail_play = new Image(0, 0);
+	video_thumbnail_play.onload = MakeReady(2);
+	video_thumbnail_play.src = '../samples/play_large.png';
+	
+	const pause_button = new Image(0, 0);
+	pause_button.onload = MakeReady(3);
+	pause_button.src = '../samples/pause.png';
+	
+	const play_button = new Image(0, 0);
+	play_button.onload = MakeReady(4);
+	play_button.src = '../samples/play.png';
+	
+	const rewatch_button = new Image(0, 0);
+	rewatch_button.onload = MakeReady(5);
+	rewatch_button.src = '../samples/rewatch.png';
 
 
 
-
-const video_thumbnail = new Image(10, 10);
-video_thumbnail.onload = drawThumbnail;
-video_thumbnail.src = '../samples/thumbnail.png'; // This won't work...
-
-
-
-//const icon_thumbnail = new Image(10, 10);
-//icon_thumbnail.src = 'LMAO.jpg';
-//icon_thumbnail.onload = drawThumbnail();
-
-
-
-function drawThumbnail() {
-		ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
-
-
-		//ctx.drawImage(icon_thumbnail, canvas.width / 2, canvas.width / 2, 128, 128);
+function MakeReady(img_id){
+	if(img_id == 1){
+		video_thumbnail_ready = true;
+	} else if(img_id == 2){
+		video_thumbnail_play_ready = true;
+	} else if(img_id == 3){
+		pause_button_ready = true;
+	} else if(img_id == 4){
+		play_button_ready = true;
+	} else if(img_id == 5){
+		rewatch_button_ready = true;
+	}
 }
+
 
 /*
 // ------------------------------
@@ -59,9 +81,9 @@ function drawThumbnail() {
 */
 
 var pause_regionX = 0;
-var pause_regionY = 0;
-var pause_regionW = 300;
-var pause_regionH = 300;
+var pause_regionY = canvas.height - 32;
+var pause_regionW = 64;
+var pause_regionH = 32;
 var pause_regionIN = false;
 
 
@@ -71,8 +93,8 @@ var mouse_posY = 0;
 
 
 canvas.onmousemove = function(e) {
-	mouse_posX = e.clientX,
-	mouse_posY = e.clientY;
+	mouse_posX = e.clientX - this.getBoundingClientRect().left,
+	mouse_posY = e.clientY - this.getBoundingClientRect().top;
 };
 
 
@@ -89,7 +111,6 @@ video.onerror = function(e){
 	document.body.removeChild(canvas);
 	document.body.innerHTML += "<h2>ERROR: Can't load video</h2><br>";
 	document.body.innerHTML += "Browser too old?";
-    
 }
 
 video.oncanplay = readyToPlayVideo; 
@@ -115,10 +136,60 @@ function readyToPlayVideo(event){
 
 
 function updateCanvas(){
-	ctx.beginPath();
 	
+	if(!videoContainer.video.paused && videoContainer.video.currentTime > 0){  
+
+		ctx.clearRect(0,0,canvas.width,canvas.height);
+		
+		ctx.fillStyle = "black";
+		ctx.fillRect(0,0,canvas.width,canvas.height);
+		ctx.fill();
+	}
+	
+
+	
+	if(Player_State == 0){
+		ctx.clearRect(0,0,canvas.width,canvas.height);
+
+
+
+		if(video_thumbnail_ready) {
+			ctx.drawImage(video_thumbnail, 0, 0, canvas.width, canvas.height);
+		}
+		if(video_thumbnail_play_ready){
+			ctx.drawImage(video_thumbnail_play, canvas.width / 2 - 256, canvas.height / 2 - 256, 512, 512);
+		}
+
+		
+		function drawPlay_button() {
+			ctx.drawImage(play_button, 0, 0, canvas.width, canvas.height);
+		}
+		
+		
+		ctx.beginPath();
+		ctx.rect(0, 0, canvas.width, canvas.height);
+		ctx.fillStyle = "rgba(0, 0, 0, 0)";
+		ctx.fill();
+	
+		if(ctx.isPointInPath(mouse_posX, mouse_posY)){
+			pause_regionIN = true;
+		} else {
+			pause_regionIN = false;
+		}
+		
+		
+	} else {
+		
+	
+	
+	
+	
+	
+	ctx.beginPath();
 	ctx.rect(pause_regionX, pause_regionY, pause_regionW, pause_regionH);
-	ctx.fillStyle = ctx.isPointInPath(mouse_posX, mouse_posY) ? "green" : "blue";
+	ctx.fillStyle = "rgba(0, 0, 0, 0)";
+	ctx.fill();
+	
 	if(ctx.isPointInPath(mouse_posX, mouse_posY)){
 		pause_regionIN = true;
 	} else {
@@ -138,19 +209,38 @@ function updateCanvas(){
 		var top = canvas.height / 2 - (vidH /2 ) * scale;
 		var left = canvas.width / 2 - (vidW /2 ) * scale;
 		
-		if(!videoContainer.video.paused && videoContainer.video.currentTime > 0){  
-			ctx.clearRect(0,0,canvas.width,canvas.height); 
-			console.log(videoContainer.video.currentTime);
-		}
+
 		ctx.drawImage(videoContainer.video, left, top, vidW * scale, vidH * scale);
+		ctx.fill();
 		DrawMenus()
+	}
 	}
 	requestAnimationFrame(updateCanvas);
 }
 function DrawMenus() {
 	ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-	ctx.rect(0, canvas.height -22, canvas.width, 22);
+	//ctx.filter = "blur(4px)";
+	
+	ctx.rect(0, canvas.height -32, canvas.width, 32);
 	ctx.fill();
+	ctx.filter = "none";
+	
+	if(videoContainer.video.paused){
+		if(videoContainer.video.ended){
+			if(rewatch_button_ready) {
+				ctx.drawImage(rewatch_button, 16, canvas.height -32, 32, 32);
+			}
+		} else{
+			if(play_button_ready) {
+				ctx.drawImage(play_button, 16, canvas.height -32, 32, 32);
+			}
+		}
+	} else {
+		if(pause_button_ready) {
+			ctx.drawImage(pause_button, 16, canvas.height -32, 32, 32);
+		}
+	}
+	
 }
 
 
@@ -159,7 +249,8 @@ function DrawMenus() {
 function playPauseClick(){
 	if(videoContainer !== undefined && videoContainer.ready){
 		if(pause_regionIN){
-			if(videoContainer.video.paused){                                 
+			if(videoContainer.video.paused){
+				Player_State = 1;
 				videoContainer.video.play();
 			}else{
 				videoContainer.video.pause();
