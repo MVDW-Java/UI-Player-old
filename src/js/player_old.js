@@ -127,7 +127,7 @@ function readyToPlayVideo(event){
 		videoContainer.video.play();
 		
 		if(!videoContainer.video.paused){ 
-			Player_State = 1;
+			Player_State = 2;
 		}
 		
 	} catch(e){
@@ -141,11 +141,15 @@ function readyToPlayVideo(event){
 
 
 function updateCanvas(){
+
+	if((videoContainer.video.currentTime == videoContainer.video.duration) || (video_thumbnail_ready && video_thumbnail_play_ready && Player_State == 1)){
+		return;
+	}
 	
 	if(!videoContainer.video.paused && videoContainer.video.currentTime > 0){  
-		Player_State = 1;
+		Player_State = 2;
+
 		ctx.clearRect(0,0,canvas.width,canvas.height);
-		
 		ctx.fillStyle = "black";
 		ctx.fillRect(0,0,canvas.width,canvas.height);
 		ctx.fill();
@@ -158,11 +162,10 @@ function updateCanvas(){
 
 
 
-		if(video_thumbnail_ready) {
+		if(video_thumbnail_ready && video_thumbnail_play_ready) {
 			ctx.drawImage(video_thumbnail, 0, 0, canvas.width, canvas.height);
-		}
-		if(video_thumbnail_play_ready){
 			ctx.drawImage(video_thumbnail_play, canvas.width / 2 - 256, canvas.height / 2 - 256, 512, 512);
+			Player_State = 1;
 		}
 
 		
@@ -183,7 +186,7 @@ function updateCanvas(){
 		}
 		
 		
-	} else {
+	} else if(Player_State == 2) {
 		
 	
 	
@@ -226,7 +229,7 @@ function updateCanvas(){
 		DrawMenus()
 	}
 	}
-	requestAnimationFrame(updateCanvas);
+	//requestAnimationFrame(updateCanvas);
 }
 function DrawMenus() {
 	ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
@@ -261,7 +264,7 @@ function playPauseClick(){
 	if(videoContainer !== undefined && videoContainer.ready){
 		if(pause_regionIN){
 			if(videoContainer.video.paused){
-				Player_State = 1;
+				Player_State = 2;
 				videoContainer.video.play();
 			}else{
 				videoContainer.video.pause();
@@ -285,3 +288,4 @@ function videoMute(){
 
 // register clicky event
 canvas.addEventListener("click", playPauseClick);
+setInterval(updateCanvas, 16);
