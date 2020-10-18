@@ -25,6 +25,7 @@ videoContainer = {
 
 var Is_Settings_Open = false;
 var Filler_Backround = true;
+var Fullscreen = false;
 /*
 // ------------------------------
 //	Thumbnail on load
@@ -213,9 +214,25 @@ function updateCanvas(){
 			
 			//Draw Menu
 			ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-			ctx.rect(0, canvas.height -32, canvas.width, 32);
+			ctx.fillRect(0, canvas.height -32, canvas.width, 32);
 			ctx.filter = "none";
-			ctx.fill();
+
+			
+			
+			
+			
+			ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+			ctx.fillRect(6, canvas.height -36, canvas.width - 12, 3);
+			ctx.filter = "none";
+			
+			var size = (video.currentTime/video.duration) * (canvas.width - 12);
+			
+			ctx.restore();
+			
+			ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+			ctx.fillRect(6, canvas.height -36, size, 3);
+			ctx.filter = "none";
+			console.log(size);
 			
 			
 			if(Is_Settings_Open){
@@ -223,8 +240,8 @@ function updateCanvas(){
 				var menu_pos_y = canvas.height / 2 - 256;
 	
 				ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-				ctx.rect(menu_pos_x, menu_pos_y, 512, 512);
-				ctx.fill();
+				ctx.fillRect(menu_pos_x, menu_pos_y, 512, 512);
+
 				
 				ctx.font = "32px Arial";
 				ctx.fillStyle = "rgba(255, 255, 255, 1)";
@@ -359,6 +376,8 @@ function HitBox(x, y, w, h, mx, my){
 }
 
 function openFullscreen() {
+
+		
   if (canvas.requestFullscreen) {
     canvas.requestFullscreen();
   } else if (canvas.mozRequestFullScreen) { /* Firefox */
@@ -368,6 +387,9 @@ function openFullscreen() {
   } else if (canvas.msRequestFullscreen) { /* IE/Edge */
     canvas.msRequestFullscreen();
   }
+  	videoContainer.scale = Math.min(
+		canvas.width / this.videoWidth, 
+		canvas.height / this.videoHeight); 
 }
 
 
