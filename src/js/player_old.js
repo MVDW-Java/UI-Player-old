@@ -62,6 +62,13 @@ var Filler_Backround = true;
 	settings_button.onload = MakeReady(6);
 	settings_button.src = '../samples/settings.png';
 	
+	const max_button = new Image(0, 0);
+	max_button.onload = MakeReady(7);
+	max_button.src = '../samples/max.png';
+	
+	const min_button = new Image(0, 0);
+	min_button.onload = MakeReady(8);
+	min_button.src = '../samples/min.png';
 
 function MakeReady(img_id){
 	if(img_id == 1){
@@ -76,6 +83,10 @@ function MakeReady(img_id){
 		rewatch_button_ready = true;
 	} else if(img_id == 6){
 		settings_button_ready = true;
+	} else if(img_id == 7){
+		max_button_ready = true;
+	} else if(img_id == 8){
+		min_button_ready = true;
 	}
 }
 
@@ -232,7 +243,10 @@ function updateCanvas(){
 			
 			//menu item drawing
 			if(settings_button_ready) {
-				ctx.drawImage(settings_button, canvas.width - 32, canvas.height -32, 32, 32);	
+				ctx.drawImage(settings_button, canvas.width - 64, canvas.height -32, 32, 32);	
+			}
+			if(max_button_ready) {
+				ctx.drawImage(max_button, canvas.width - 32, canvas.height -32, 32, 32);	
 			}
 			if(videoContainer.video.paused){
 				if(videoContainer.video.ended){
@@ -288,7 +302,7 @@ function onClickPlayer(){
 					
 				}
 			}
-			regionX = canvas.width - 32;
+			regionX = canvas.width - 64;
 			regionY = canvas.height - 32;
 			regionW = 32;
 			regionH = 32;
@@ -299,6 +313,19 @@ function onClickPlayer(){
 					Is_Settings_Open = true;
 				}
 			}
+			
+			
+			regionX = canvas.width - 32;
+			regionY = canvas.height - 32;
+			regionW = 32;
+			regionH = 32;
+			if(HitBox(regionX, regionY, regionW, regionH, mouse_posX, mouse_posY)){
+				canvas.width = screen.width
+				canvas.height = screen.height
+				openFullscreen()
+			}
+			
+			
 			if(Is_Settings_Open){
 				regionX = canvas.width / 2 - 256 + 12;
 				regionY = canvas.height / 2 - 256 + 108;
@@ -331,6 +358,17 @@ function HitBox(x, y, w, h, mx, my){
 	return false;
 }
 
+function openFullscreen() {
+  if (canvas.requestFullscreen) {
+    canvas.requestFullscreen();
+  } else if (canvas.mozRequestFullScreen) { /* Firefox */
+    canvas.mozRequestFullScreen();
+  } else if (canvas.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+    canvas.webkitRequestFullscreen();
+  } else if (canvas.msRequestFullscreen) { /* IE/Edge */
+    canvas.msRequestFullscreen();
+  }
+}
 
 
 
