@@ -349,7 +349,7 @@ function onClickPlayer(){
 			var regionH = 20;
 			
 			if(HitBox(regionX, regionY, regionW, regionH, mouse_posX, mouse_posY)){
-				var calc = (video.duration * mouse_posX) / (canvas.width - 12);
+				var calc = (video.duration * (mouse_posX - 6)) / (canvas.width - 12);
 				video.currentTime = calc
 			}
 			
