@@ -160,7 +160,7 @@ function readyToPlayVideo(event){
 
 
 function updateCanvas(){
-
+	
 	if((mouse_posX == check_mouse_posX && mouse_posY == check_mouse_posY &&  Player_State == 2) || (video_thumbnail_ready && video_thumbnail_play_ready && Player_State == 1)){
 		return; // Not need to update, optimizing performance.
 	}
@@ -222,7 +222,7 @@ function updateCanvas(){
 			
 			
 			ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-			ctx.fillRect(6, canvas.height -36, canvas.width - 12, 3);
+			ctx.fillRect(6, canvas.height -36, canvas.width - 12, 4);
 			ctx.filter = "none";
 			
 			var size = (video.currentTime/video.duration) * (canvas.width - 12);
@@ -230,7 +230,7 @@ function updateCanvas(){
 			ctx.restore();
 			
 			ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
-			ctx.fillRect(6, canvas.height -36, size, 3);
+			ctx.fillRect(6, canvas.height -36, size, 4);
 			ctx.filter = "none";
 			console.log(size);
 			
@@ -342,6 +342,16 @@ function onClickPlayer(){
 				openFullscreen()
 			}
 			
+			//
+			var regionX = 6;
+			var regionY = canvas.height - 52;
+			var regionW = canvas.width - 12;
+			var regionH = 20;
+			
+			if(HitBox(regionX, regionY, regionW, regionH, mouse_posX, mouse_posY)){
+				var calc = (video.duration * mouse_posX) / (canvas.width - 12);
+				video.currentTime = calc
+			}
 			
 			if(Is_Settings_Open){
 				regionX = canvas.width / 2 - 256 + 12;
