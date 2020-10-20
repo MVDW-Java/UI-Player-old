@@ -42,15 +42,23 @@ var images_ready = new Map();
 
 
 //prepairing statuses
-var p_status_count = 0
-var PlayerStatus = {};
-UI_Player_Settings["players"].forEach(function(){
-	PlayerStatus[p_status_count] = {
-		"state": 0
-	}
-	p_status_count++;
-})
 
+var PlayerStatus = {};
+var player_count_thumbnail = 0;
+UI_Player_Settings["players"].forEach(function(){
+	const video_thumbnail = new Image(0, 0);
+		
+	video_thumbnail.onload = SetPlayerStatus(player_count_thumbnail, video_thumbnail);
+	video_thumbnail.src = UI_Player_Settings["players"][player_count_thumbnail]["thumbnail_url"];
+	
+	player_count_thumbnail++;
+})
+function SetPlayerStatus(id, video_thumbnail){
+	PlayerStatus[id] = {
+		"state": 0,
+		"thumbnail": video_thumbnail
+	}
+}
 
 function GetPlayerElement(type, player_id){
 	if(type == 0) return document.getElementById(UI_Player_Settings["players"][player_id]["canvas_id"]);
@@ -72,19 +80,9 @@ function GetPlayerElement(type, player_id){
 	
 	
 	//Loading up image
-	var video_thumbnail_play_ready = false;
-	const video_thumbnail = new Image(0, 0);
-	video_thumbnail.onload = MakeReady(1);
-	video_thumbnail.src = UI_Player_Settings["players"][0]["thumbnail_url"];
-	
 
-function MakeReady(img_id){
-	
-	if(img_id == 1){
-		video_thumbnail_ready = true;
-	}
-}
- 
+
+
 
 /*
 // ------------------------------
@@ -157,7 +155,7 @@ function updateCanvas(){
 	var i =0;
 	UI_Player_Settings["players"].forEach(function(){
 		
-	if((mouse_posX == check_mouse_posX && mouse_posY == check_mouse_posY && PlayerStatus[i]["state"] == 2) || (video_thumbnail_ready && images_ready.has("play_large.png") && PlayerStatus[i]["state"] == 1)){
+	if((mouse_posX == check_mouse_posX && mouse_posY == check_mouse_posY && PlayerStatus[i]["state"] == 2) || (PlayerStatus[i]["thumbnail"] && images_ready.has("play_large.png") && PlayerStatus[i]["state"] == 1)){
 		return; // Not need to update, optimizing performance.
 	}
 	var canvas = GetPlayerElement(0,i);
@@ -179,8 +177,8 @@ function updateCanvas(){
 	if(PlayerStatus[i]["state"] == 0){
 		
 
-		if(video_thumbnail_ready && images_ready.has("play_large.png")) {
-			ctx.drawImage(video_thumbnail, 0, 0, canvas.width, canvas.height);
+		if(PlayerStatus[i]["thumbnail"] && images_ready.has("play_large.png")) {
+			ctx.drawImage(PlayerStatus[i]["thumbnail"], 0, 0, canvas.width, canvas.height);
 			ctx.drawImage(images_ready.get("play_large.png"), canvas.width / 2 - 256, canvas.height / 2 - 256, 512, 512);
 			PlayerStatus[i]["state"] = 1;
 		}
