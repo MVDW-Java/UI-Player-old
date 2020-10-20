@@ -7,12 +7,20 @@
 
 // Data stuff
 var Player_State = 0;
-
-
 var muted = false;
 
+
+
+
+
 var videoContainer;
+
+
+
+
+
 var video = document.createElement("video"); 
+
 video.src = UI_Player_Settings["players"][0]["resolution"]["720p"];
 video.loop = false;
 video.muted = muted;
@@ -25,8 +33,23 @@ videoContainer = {
 var Is_Settings_Open = false;
 var Filler_Backround = true;
 var Fullscreen = false;
+
+
+
+//image data
 var images = ["play_large.png", "pause.png", "play.png", "rewatch.png", "settings.png", "max.png", "min.png"];
 var images_ready = new Map();
+
+
+//prepairing statuses
+var p_status_count = 0
+var PlayerStatus = {};
+UI_Player_Settings["players"].forEach(function(){
+	PlayerStatus[p_status_count] = {
+		"state": 0
+	}
+	p_status_count++;
+})
 
 
 function GetPlayerElement(type, player_id){
@@ -114,10 +137,10 @@ function readyToPlayVideo(event){
 
 	try {
 		requestAnimationFrame(updateCanvas);
-		videoContainer.video.play();
+		//videoContainer.video.play();
 		
 		if(!videoContainer.video.paused){ 
-			Player_State = 2;
+			PlayerStatus[i]["state"] = 2;
 		}
 		
 	} catch(e){
@@ -131,15 +154,17 @@ function readyToPlayVideo(event){
 
 
 function updateCanvas(){
-	
-	if((mouse_posX == check_mouse_posX && mouse_posY == check_mouse_posY &&  Player_State == 2) || (video_thumbnail_ready && images_ready.has("play_large.png") && Player_State == 1)){
+	var i =0;
+	UI_Player_Settings["players"].forEach(function(){
+		
+	if((mouse_posX == check_mouse_posX && mouse_posY == check_mouse_posY && PlayerStatus[i]["state"] == 2) || (video_thumbnail_ready && images_ready.has("play_large.png") && PlayerStatus[i]["state"] == 1)){
 		return; // Not need to update, optimizing performance.
 	}
-	var canvas = GetPlayerElement(0,0);
-	var ctx = GetPlayerElement(1,0)
+	var canvas = GetPlayerElement(0,i);
+	var ctx = GetPlayerElement(1,i)
 	
 	if(!videoContainer.video.paused && videoContainer.video.currentTime > 0){ 
-		Player_State = 2; // change state to play player if not already
+		PlayerStatus[i]["state"] = 2; // change state to play player if not already
 	}
 	
 	ctx.clearRect(0,0,canvas.width, canvas.height); // clear screen
@@ -149,19 +174,19 @@ function updateCanvas(){
 	ctx.fillRect(0,0,canvas.width, canvas.height);
 	//ctx.fill(); //fill black screen
 	
-
+	//console.log("update");
 	
-	if(Player_State == 0){
+	if(PlayerStatus[i]["state"] == 0){
 		
 
 		if(video_thumbnail_ready && images_ready.has("play_large.png")) {
 			ctx.drawImage(video_thumbnail, 0, 0, canvas.width, canvas.height);
 			ctx.drawImage(images_ready.get("play_large.png"), canvas.width / 2 - 256, canvas.height / 2 - 256, 512, 512);
-			Player_State = 1;
+			PlayerStatus[i]["state"] = 1;
 		}
 
 
-	} else if(Player_State == 2) {
+	} else if(PlayerStatus[i]["state"] == 2) {
 		
 		if(videoContainer !== undefined && videoContainer.ready){ 
 		
@@ -183,7 +208,6 @@ function updateCanvas(){
 			
 		
 
-			console.log("draw video");
 			
 			//Draw Menu
 			ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
@@ -200,12 +224,10 @@ function updateCanvas(){
 			
 			var size = (video.currentTime/video.duration) * (canvas.width - 12);
 			
-			ctx.restore();
 			
 			ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
 			ctx.fillRect(6, canvas.height -36, size, 4);
 			ctx.filter = "none";
-			console.log(size);
 			
 			
 			if(Is_Settings_Open){
@@ -256,27 +278,33 @@ function updateCanvas(){
 			}
 		}
 	}
-	
+	i++;
+	})
 }
 
 
 
 
 
-function onClickPlayer(){
+var ic =0;
+UI_Player_Settings["players"].forEach(function(){
+	var canvas = GetPlayerElement(0,ic);
+	var ctx = GetPlayerElement(1,ic);
+	
+	canvas.addEventListener("click", function(){
+	var i = ic;
 	if(videoContainer !== undefined && videoContainer.ready){
-		
-		var canvas = GetPlayerElement(0,0);
-		var ctx = GetPlayerElement(1,0);
+			
+
 		
 		//click 
-		if(Player_State == 1) {
-			Player_State = 2;
+		if(PlayerStatus[0]["state"] == 1) {
+			PlayerStatus[0]["state"] = 2;
 			videoContainer.video.play();
 			return;
 			
 			
-		} else if(Player_State == 2){
+		} else if(PlayerStatus[0]["state"] == 2){
 			var regionX = 0;
 			var regionY = canvas.height - 32;
 			var regionW = 64;
@@ -288,7 +316,7 @@ function onClickPlayer(){
 			
 			if(HitBox(regionX, regionY, regionW, regionH, mouse_posX, mouse_posY)){
 				if(videoContainer.video.paused){
-					Player_State = 2;
+					PlayerStatus[0]["state"] = 2;
 					videoContainer.video.play();
 				} else {
 					videoContainer.video.pause();
@@ -344,10 +372,11 @@ function onClickPlayer(){
 			}
 			
 			
-			
 		}
-	}
-}
+		}
+	})
+	ic++;
+})
 function HitBox(x, y, w, h, mx, my){
 	if(x < mx && w+x > mx){
 		if(y < my && y+h > my){
@@ -386,8 +415,15 @@ function videoMute(){
          
 	}
 }
-
+setInterval(updateCanvas, 16);
 
 // register clicky event
-GetPlayerElement(0,0).addEventListener("click", onClickPlayer);
-setInterval(updateCanvas, 16);
+/*
+
+	console.log("add listener: " +ic);
+	//GetPlayerElement(0,ic).addEventListener("click", onClickPlayer(ic));
+	ic++;
+})*/
+
+
+//document.getElementById(UI_Player_Settings["players"][0]["canvas_id"]).addEventListener("click", onClickPlayer);
