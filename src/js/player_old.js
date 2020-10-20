@@ -26,71 +26,36 @@ videoContainer = {
 var Is_Settings_Open = false;
 var Filler_Backround = true;
 var Fullscreen = false;
+var images = ["play_large.png", "pause.png", "play.png", "rewatch.png", "settings.png", "max.png", "min.png"];
+var images_ready = new Map();
 /*
 // ------------------------------
-//	Thumbnail on load
+//	Loading in images into map
 // ------------------------------
 */
-	//ready?
-	var video_thumbnail_play_ready = false;
-	var video_thumbnail_ready = false;
-	var pause_button_ready = false;
-	var play_button_ready = false;
-	var rewatch_button_ready = false;
+	
+	for (img of images) {
+		const image = new Image(0, 0);
+		image.onload = images_ready.set(img, image);
+		image.src = "../samples/" + img;
+	}
+	
+	
 	
 	//Loading up image
+	var video_thumbnail_play_ready = false;
 	const video_thumbnail = new Image(0, 0);
 	video_thumbnail.onload = MakeReady(1);
 	video_thumbnail.src = '../samples/thumbnail.png';
 	
-	const video_thumbnail_play = new Image(0, 0);
-	video_thumbnail_play.onload = MakeReady(2);
-	video_thumbnail_play.src = '../samples/play_large.png';
-	
-	const pause_button = new Image(0, 0);
-	pause_button.onload = MakeReady(3);
-	pause_button.src = '../samples/pause.png';
-	
-	const play_button = new Image(0, 0);
-	play_button.onload = MakeReady(4);
-	play_button.src = '../samples/play.png';
-	
-	const rewatch_button = new Image(0, 0);
-	rewatch_button.onload = MakeReady(5);
-	rewatch_button.src = '../samples/rewatch.png';
-
-	const settings_button = new Image(0, 0);
-	settings_button.onload = MakeReady(6);
-	settings_button.src = '../samples/settings.png';
-	
-	const max_button = new Image(0, 0);
-	max_button.onload = MakeReady(7);
-	max_button.src = '../samples/max.png';
-	
-	const min_button = new Image(0, 0);
-	min_button.onload = MakeReady(8);
-	min_button.src = '../samples/min.png';
 
 function MakeReady(img_id){
+	
 	if(img_id == 1){
 		video_thumbnail_ready = true;
-	} else if(img_id == 2){
-		video_thumbnail_play_ready = true;
-	} else if(img_id == 3){
-		pause_button_ready = true;
-	} else if(img_id == 4){
-		play_button_ready = true;
-	} else if(img_id == 5){
-		rewatch_button_ready = true;
-	} else if(img_id == 6){
-		settings_button_ready = true;
-	} else if(img_id == 7){
-		max_button_ready = true;
-	} else if(img_id == 8){
-		min_button_ready = true;
 	}
 }
-
+ 
 
 /*
 // ------------------------------
@@ -161,7 +126,7 @@ function readyToPlayVideo(event){
 
 function updateCanvas(){
 	
-	if((mouse_posX == check_mouse_posX && mouse_posY == check_mouse_posY &&  Player_State == 2) || (video_thumbnail_ready && video_thumbnail_play_ready && Player_State == 1)){
+	if((mouse_posX == check_mouse_posX && mouse_posY == check_mouse_posY &&  Player_State == 2) || (video_thumbnail_ready && images_ready.has("play_large.png") && Player_State == 1)){
 		return; // Not need to update, optimizing performance.
 	}
 	
@@ -181,9 +146,9 @@ function updateCanvas(){
 	if(Player_State == 0){
 		
 
-		if(video_thumbnail_ready && video_thumbnail_play_ready) {
+		if(video_thumbnail_ready && images_ready.has("play_large.png")) {
 			ctx.drawImage(video_thumbnail, 0, 0, canvas.width, canvas.height);
-			ctx.drawImage(video_thumbnail_play, canvas.width / 2 - 256, canvas.height / 2 - 256, 512, 512);
+			ctx.drawImage(images_ready.get("play_large.png"), canvas.width / 2 - 256, canvas.height / 2 - 256, 512, 512);
 			Player_State = 1;
 		}
 
@@ -259,26 +224,26 @@ function updateCanvas(){
 			
 			
 			//menu item drawing
-			if(settings_button_ready) {
-				ctx.drawImage(settings_button, canvas.width - 64, canvas.height -32, 32, 32);	
+			if(images_ready.has("settings.png")) {
+				ctx.drawImage(images_ready.get("settings.png"), canvas.width - 64, canvas.height -32, 32, 32);	
 			}
-			if(max_button_ready) {
-				ctx.drawImage(max_button, canvas.width - 32, canvas.height -32, 32, 32);	
+			if(images_ready.has("max.png")) {
+				ctx.drawImage(images_ready.get("max.png"), canvas.width - 32, canvas.height -32, 32, 32);	
 			}
 			if(videoContainer.video.paused){
 				if(videoContainer.video.ended){
-					if(rewatch_button_ready) {
-						ctx.drawImage(rewatch_button, 16, canvas.height -32, 32, 32);
+					if(images_ready.has("rewatch.png")) {
+						ctx.drawImage(images_ready.get("rewatch.png"), 16, canvas.height -32, 32, 32);
 					}
 				} else{
-					if(play_button_ready) {
-						ctx.drawImage(play_button, 16, canvas.height -32, 32, 32);
+					if(images_ready.has("play.png")) {
+						ctx.drawImage(images_ready.get("play.png"), 16, canvas.height -32, 32, 32);
 						
 					}
 				}
 			} else {
-				if(pause_button_ready) {
-					ctx.drawImage(pause_button, 16, canvas.height -32, 32, 32);
+				if(images_ready.has("pause.png")) {
+					ctx.drawImage(images_ready.get("pause.png"), 16, canvas.height -32, 32, 32);
 				}
 			}
 		}
@@ -373,15 +338,11 @@ function onClickPlayer(){
 	}
 }
 function HitBox(x, y, w, h, mx, my){
-	console.log("Hitbox");
 	if(x < mx && w+x > mx){
-		console.log("check 1");
 		if(y < my && y+h > my){
-			console.log("Hitbox true");
 			return true;
 		}
 	}
-	console.log("Hitbox false");
 	return false;
 }
 
