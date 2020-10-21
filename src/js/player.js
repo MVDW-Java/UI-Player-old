@@ -1,10 +1,3 @@
-// WARNING!! THIS PLAYER WAS MADE WHEN I DID KNOW LESS OF JS. IT REALLY TRASH1!
-// DON'T USE THIS!!!!!!
-
-
-
-
-
 // Data stuff
 var Player_State = 0;
 var muted = false;
@@ -341,7 +334,7 @@ UI_Player_Settings["players"].forEach(function(){
 			if(HitBox(regionX, regionY, regionW, regionH, mouse_posX, mouse_posY)){
 				canvas.width = screen.width
 				canvas.height = screen.height
-				openFullscreen()
+				openFullscreen(0)
 			}
 			
 			//
@@ -384,9 +377,12 @@ function HitBox(x, y, w, h, mx, my){
 	return false;
 }
 
-function openFullscreen() {
+function openFullscreen(i) {
+	var canvas = GetPlayerElement(0,i);
+	var ctx = GetPlayerElement(1,i)
+	
 
-		
+	
   if (canvas.requestFullscreen) {
     canvas.requestFullscreen();
   } else if (canvas.mozRequestFullScreen) { /* Firefox */
@@ -396,9 +392,11 @@ function openFullscreen() {
   } else if (canvas.msRequestFullscreen) { /* IE/Edge */
     canvas.msRequestFullscreen();
   }
-  	videoContainer.scale = Math.min(
-		canvas.width / this.videoWidth, 
-		canvas.height / this.videoHeight); 
+  	var scale = videoContainer.scale;
+			var vidH = videoContainer.video.videoHeight;
+			var vidW = videoContainer.video.videoWidth;
+			var top = canvas.height / 2 - (vidH /2 ) * scale;
+			var left = canvas.width / 2 - (vidW /2 ) * scale;
 }
 
 
