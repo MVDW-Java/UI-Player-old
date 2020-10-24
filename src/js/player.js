@@ -5,7 +5,6 @@ var muted = false;
 
 
 
-
 var videoContainer;
 
 
@@ -63,7 +62,7 @@ function GetPlayerElement(type, player_id){
 //	Loading in images into map
 // ------------------------------
 */
-	
+	var img;
 	for (img of images) {
 		const image = new Image(0, 0);
 		image.onload = images_ready.set(img, image);
@@ -112,6 +111,7 @@ GetPlayerElement(0,0).onmousemove = function(e) {
 
 // Error shit..
 video.onerror = function(e){
+	ErrorHandler(video.error.message);
 	document.body.removeChild(GetPlayerElement(0,0));
 	document.body.innerHTML += "<h2>ERROR: Can't load video</h2><br>";
 	document.body.innerHTML += "Browser too old?";
@@ -412,6 +412,12 @@ function videoMute(){
 	}
 }
 setInterval(updateCanvas, 16);
+
+function ErrorHandler(message) {
+	console.log("%cUI-Player Error!","color:red;font-family:system-ui;font-size:22px;-webkit-text-stroke: 1px black;font-weight:bold");
+	console.log("%cPlease report this to the developers of UI-Player: " + message, "color:white;font-family:system-ui;font-size:22px;-webkit-text-stroke: 1px black;font-weight:bold");
+}
+
 
 // register clicky event
 /*
